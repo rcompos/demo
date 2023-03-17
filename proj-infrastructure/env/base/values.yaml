@@ -1,5 +1,6 @@
 spec:
-  project: proj-infrastructure
+  # project: proj-infrastructure
+  project: default
   destination:
     server: https://kubernetes.default.svc
     namePrefix: ""
