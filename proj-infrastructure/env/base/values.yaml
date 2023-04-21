@@ -43,4 +43,12 @@ apps:
     repo: ""
     path: ""
     targetRev: ""
+  metricsServer:
+    name: metrics-server 
+    fullnameOverride: ""
+    values: []
+    namespace: ""
+    repo: ""
+    path: ""
+    targetRev: ""
 
