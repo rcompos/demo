@@ -36,13 +36,10 @@ uid: 50000
 gid: 0
 
 # Default security context for airflow
-# securityContext: {}
+securityContext: {}
 #  runAsUser: 50000
 #  fsGroup: 0
 #  runAsGroup: 0
-securityContext:
- runAsUser: 50000
- fsGroup: 50000
 
 # Airflow home directory
 # Used for mount paths
