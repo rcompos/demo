@@ -578,7 +578,19 @@ workers:
   # container finishes so Airflow can continue the worker shutdown process!
   extraContainers: []
   # Add additional init containers into workers.
-  extraInitContainers: []
+  # extraInitContainers: []
+  extraInitContainers:
+  - args:
+    - s3
+    - cp
+    - --recursive
+    - s3://rcompos-example-bucket/dags
+    - /dags
+    image: amazon/aws-cli:2.1.34
+    name: sync-dags
+    volumeMounts:
+    - mountPath: /dags
+      name: dags
 
   # Mount additional volumes into worker. It can be templated like in the following example:
   #   extraVolumes:
@@ -592,8 +604,19 @@ workers:
   #     - name: my-templated-extra-volume
   #       mountPath: "{{ .Values.my_custom_path }}"
   #       readOnly: true
-  extraVolumes: []
-  extraVolumeMounts: []
+  # extraVolumes: []
+  extraVolumes:
+  - name: aws-creds-cm-volume
+    configMap:
+      name: aws-creds-cm
+  # extraVolumeMounts: []
+  extraVolumeMounts:
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/credentials
+      subPath: credentials
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/config
+      subPath: config
 
   # Select certain nodes for airflow worker pods.
   nodeSelector: {}
