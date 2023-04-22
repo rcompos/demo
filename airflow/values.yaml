@@ -797,10 +797,12 @@ scheduler:
   #   - name: aws-creds-cm-volume
   #     mountPath: /root/.aws/config
   #     subPath: config
+
+  # TEST init container for debug
   extraInitContainers:
   - args: ["s3", "ls"]
     name: dag-sync-init-test
-    image: amazon/aws-cli:latest 
+    image: amazon/aws-cli:2.1.34
     volumeMounts:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/credentials
