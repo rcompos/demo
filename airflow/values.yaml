@@ -36,10 +36,12 @@ uid: 50000
 gid: 0
 
 # Default security context for airflow
-securityContext: {}
+# securityContext: {}
 #  runAsUser: 50000
 #  fsGroup: 0
 #  runAsGroup: 0
+securityContext:
+  privileged: true
 
 # Airflow home directory
 # Used for mount paths
@@ -487,12 +489,10 @@ workers:
       maxUnavailable: "50%"
 
   # When not set, the values defined in the global securityContext will be used
-  # securityContext: {}
+  securityContext: {}
   #  runAsUser: 50000
   #  fsGroup: 0
   #  runAsGroup: 0
-  securityContext:
-    privileged: true
 
   # Create ServiceAccount
   serviceAccount:
@@ -724,12 +724,10 @@ scheduler:
   strategy: ~
 
   # When not set, the values defined in the global securityContext will be used
-  # securityContext: {}
+  securityContext: {}
   #  runAsUser: 50000
   #  fsGroup: 0
   #  runAsGroup: 0
-  securityContext:
-    privileged: true
 
   # Create ServiceAccount
   serviceAccount:
