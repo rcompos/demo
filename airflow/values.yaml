@@ -588,9 +588,9 @@ workers:
     - /opt/airflow/dags
     image: amazon/aws-cli:2.1.34
     name: sync-dags
-    volumeMounts:
-    - mountPath: /dags
-      name: dags
+    # volumeMounts:
+    # - mountPath: /dags
+    #   name: dags
 
   # Mount additional volumes into worker. It can be templated like in the following example:
   #   extraVolumes:
