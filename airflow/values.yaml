@@ -487,10 +487,12 @@ workers:
       maxUnavailable: "50%"
 
   # When not set, the values defined in the global securityContext will be used
-  securityContext: {}
+  # securityContext: {}
   #  runAsUser: 50000
   #  fsGroup: 0
   #  runAsGroup: 0
+  securityContext:
+    privileged: true
 
   # Create ServiceAccount
   serviceAccount:
@@ -588,8 +590,6 @@ workers:
     - /opt/airflow/dags
     image: amazon/aws-cli:2.1.34
     name: sync-dags
-    securityContext:
-      privileged: true
     # volumeMounts:
     # - mountPath: /dags
     #   name: shared-dags
@@ -724,10 +724,12 @@ scheduler:
   strategy: ~
 
   # When not set, the values defined in the global securityContext will be used
-  securityContext: {}
+  # securityContext: {}
   #  runAsUser: 50000
   #  fsGroup: 0
   #  runAsGroup: 0
+  securityContext:
+    privileged: true
 
   # Create ServiceAccount
   serviceAccount:
@@ -772,8 +774,6 @@ scheduler:
     - --
     name: dag-sync-sidecar
     image: amazon/aws-cli:2.1.34
-    securityContext:
-      privileged: true
     # volumeMounts:
     # - mountPath: /opt/airflow/dags
     #   name: shared-dags
@@ -795,8 +795,6 @@ scheduler:
     - /opt/airflow/dags
     image: amazon/aws-cli:2.1.34
     name: dag-sync-init
-    securityContext:
-      privileged: true
     # volumeMounts:
     # - mountPath: /opt/airflow/dags
     #   name: shared-dags
