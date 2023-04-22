@@ -595,10 +595,10 @@ workers:
     - mountPath: /dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/credentials
+      mountPath: /root/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/config
+      mountPath: /root/.aws/config
       subPath: config
 
   # Mount additional volumes into worker. It can be templated like in the following example:
@@ -622,12 +622,6 @@ workers:
     emptyDir: {}
   # extraVolumeMounts: []
   extraVolumeMounts:
-    - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/credentials
-      subPath: credentials
-    - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/config
-      subPath: config
     - name: shared-dags
       mountPath: /opt/airflow/dags
 
@@ -777,10 +771,10 @@ scheduler:
     - mountPath: /opt/airflow/dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/credentials
+      mountPath: /root/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/config
+      mountPath: /root/.aws/config
       subPath: config
 
   # Add additional init containers into scheduler.
@@ -798,10 +792,10 @@ scheduler:
     - mountPath: /opt/airflow/dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/credentials
+      mountPath: /root/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/config
+      mountPath: /root/.aws/config
       subPath: config
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
@@ -828,12 +822,12 @@ scheduler:
   extraVolumeMounts:
     - name: shared-dags
       mountPath: /opt/airflow/dags
-    - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/credentials
-      subPath: credentials
-    - name: aws-creds-cm-volume
-      mountPath: /home/airflow/.aws/config
-      subPath: config
+    # - name: aws-creds-cm-volume
+    #   mountPath: /root/.aws/credentials
+    #   subPath: credentials
+    # - name: aws-creds-cm-volume
+    #   mountPath: /root/.aws/config
+    #   subPath: config
 
   # Select certain nodes for airflow scheduler pods.
   nodeSelector: {}
