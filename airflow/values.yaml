@@ -595,10 +595,10 @@ workers:
     - mountPath: /dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/credentials
+      mountPath: /home/airflow/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/config
+      mountPath: /home/airflow/.aws/config
       subPath: config
 
   # Mount additional volumes into worker. It can be templated like in the following example:
@@ -623,10 +623,10 @@ workers:
   # extraVolumeMounts: []
   extraVolumeMounts:
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/credentials
+      mountPath: /home/airflow/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/config
+      mountPath: /home/airflow/.aws/config
       subPath: config
     - name: shared-dags
       mountPath: /opt/airflow/dags
@@ -829,10 +829,10 @@ scheduler:
     - name: shared-dags
       mountPath: /opt/airflow/dags
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/credentials
+      mountPath: /home/airflow/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/config
+      mountPath: /home/airflow/.aws/config
       subPath: config
 
   # Select certain nodes for airflow scheduler pods.
