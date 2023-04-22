@@ -773,15 +773,15 @@ scheduler:
     - --
     name: dag-sync-sidecar
     image: amazon/aws-cli:2.1.34
-    # volumeMounts:
-    # - mountPath: /opt/airflow/dags
-    #   name: shared-dags
-    # - name: aws-creds-cm-volume
-    #   mountPath: /root/.aws/credentials
-    #   subPath: credentials
-    # - name: aws-creds-cm-volume
-    #   mountPath: /root/.aws/config
-    #   subPath: config
+    volumeMounts:
+    - mountPath: /opt/airflow/dags
+      name: shared-dags
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/credentials
+      subPath: credentials
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/config
+      subPath: config
 
   # Add additional init containers into scheduler.
   # extraInitContainers: []
@@ -794,15 +794,15 @@ scheduler:
     - /opt/airflow/dags
     image: amazon/aws-cli:2.1.34
     name: dag-sync-init
-    # volumeMounts:
-    # - mountPath: /opt/airflow/dags
-    #   name: shared-dags
-    # - name: aws-creds-cm-volume
-    #   mountPath: /root/.aws/credentials
-    #   subPath: credentials
-    # - name: aws-creds-cm-volume
-    #   mountPath: /root/.aws/config
-    #   subPath: config
+    volumeMounts:
+    - mountPath: /opt/airflow/dags
+      name: shared-dags
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/credentials
+      subPath: credentials
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/config
+      subPath: config
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
   #   extraVolumes:
