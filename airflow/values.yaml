@@ -609,6 +609,8 @@ workers:
   - name: aws-creds-cm-volume
     configMap:
       name: aws-creds-cm
+  - name: shared-dags
+    emptyDir: {}
   # extraVolumeMounts: []
   extraVolumeMounts:
     - name: aws-creds-cm-volume
@@ -617,6 +619,8 @@ workers:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
+    - name: shared-dags
+      mountPath: /opt/airflow/dags
 
   # Select certain nodes for airflow worker pods.
   nodeSelector: {}
@@ -752,7 +756,7 @@ scheduler:
   # extraContainers: []
   extraContainers:
   - args:
-    - while true; aws s3 sync --exact-timestamps --delete 's3://rcompos-example-bucket/dags' '/opt/airflow/dags';
+    - while true; aws s3 sync --exact-timestamps --delete 's3://rcompos-example-bucket/dags' '/dags';
       do sleep 600; done;
     command:
     - /bin/bash
@@ -760,9 +764,9 @@ scheduler:
     - --
     name: dag-sync-sidecar
     image: amazon/aws-cli:2.1.34
-    # volumeMounts:
-    # - mountPath: /dags
-    #   name: dags
+    volumeMounts:
+    - mountPath: /dags
+      name: shared-dags
 
   # Add additional init containers into scheduler.
   # extraInitContainers: []
@@ -772,12 +776,12 @@ scheduler:
     - cp
     - --recursive
     - s3://rcompos-example-bucket/dags
-    - /opt/airflow/dags
+    - /dags
     image: amazon/aws-cli:2.1.34
     name: dag-sync-init
-    # volumeMounts:
-    # - mountPath: /dags
-    #   name: dags
+    volumeMounts:
+    - mountPath: /dags
+      name: shared-dags
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
   #   extraVolumes:
@@ -797,6 +801,8 @@ scheduler:
   - name: aws-creds-cm-volume
     configMap:
       name: aws-creds-cm
+  - name: shared-dags
+    emptyDir: {}
   # extraVolumeMounts: []
   extraVolumeMounts:
     - name: aws-creds-cm-volume
@@ -805,6 +811,8 @@ scheduler:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
+    - name: shared-dags
+      mountPath: /opt/airflow/dags
 
   # Select certain nodes for airflow scheduler pods.
   nodeSelector: {}
