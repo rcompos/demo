@@ -597,12 +597,6 @@ workers:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
-    volumes:
-    - name: aws-creds-cm-volume
-      configMap:
-        name: aws-creds-cm
-    - name: shared-dags
-      emptyDir: {}
 
   # Mount additional volumes into worker. It can be templated like in the following example:
   #   extraVolumes:
@@ -785,12 +779,6 @@ scheduler:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
-    volumes:
-    - name: aws-creds-cm-volume
-      configMap:
-        name: aws-creds-cm
-    - name: shared-dags
-      emptyDir: {}
 
   # Add additional init containers into scheduler.
   # extraInitContainers: []
@@ -812,12 +800,6 @@ scheduler:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
-    volumes:
-    - name: aws-creds-cm-volume
-      configMap:
-        name: aws-creds-cm
-    - name: shared-dags
-      emptyDir: {}
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
   #   extraVolumes:
