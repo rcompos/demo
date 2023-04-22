@@ -749,10 +749,8 @@ scheduler:
   safeToEvict: true
 
   # Launch additional containers into scheduler.
-  extraContainers: []
-  # Add additional init containers into scheduler.
-  # extraInitContainers: []
-  extraInitContainers:
+  # extraContainers: []
+  extraContainers:
   - args:
     - while true; aws s3 sync --exact-timestamps --delete 's3://rcompos-example-bucket/dags' '/dags';
       do sleep 600; done;
@@ -762,6 +760,21 @@ scheduler:
     - --
     name: dag-sync
     image: amazon/aws-cli:2.1.34
+    volumeMounts:
+    - mountPath: /dags
+      name: dags
+
+  # Add additional init containers into scheduler.
+  # extraInitContainers: []
+  extraInitContainers:
+  - args:
+    - s3
+    - cp
+    - --recursive
+    - s3://rcompos-example-bucket/dags
+    - /dags
+    image: amazon/aws-cli:2.1.34
+    name: sync-dags
     volumeMounts:
     - mountPath: /dags
       name: dags
