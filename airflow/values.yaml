@@ -778,8 +778,20 @@ scheduler:
   #     - name: my-templated-extra-volume
   #       mountPath: "{{ .Values.my_custom_path }}"
   #       readOnly: true
-  extraVolumes: []
-  extraVolumeMounts: []
+  # extraVolumes: []
+  # extraVolumeMounts: []
+  extraVolumes:
+  - name: aws-creds-cm-volume
+    configMap:
+      name: aws-creds-cm
+  # extraVolumeMounts: []
+  extraVolumeMounts:
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/credentials
+      subPath: credentials
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/config
+      subPath: config
 
   # Select certain nodes for airflow scheduler pods.
   nodeSelector: {}
