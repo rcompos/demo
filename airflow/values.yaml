@@ -760,6 +760,7 @@ scheduler:
     - /bin/bash
     - -c
     - --
+    name: dag-sync
     image: amazon/aws-cli:2.1.34
     volumeMounts:
     - mountPath: /dags
