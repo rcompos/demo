@@ -799,7 +799,7 @@ scheduler:
   #     subPath: config
   extraInitContainers:
   - args: ["s3", "ls"]
-    - name: dag-sync-init-test
+    name: dag-sync-init-test
     image: amazon/aws-cli:latest 
     volumeMounts:
     - name: aws-creds-cm-volume
