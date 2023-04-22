@@ -760,9 +760,9 @@ scheduler:
     - --
     name: dag-sync
     image: amazon/aws-cli:2.1.34
-    volumeMounts:
-    - mountPath: /dags
-      name: dags
+    # volumeMounts:
+    # - mountPath: /dags
+    #   name: dags
 
   # Add additional init containers into scheduler.
   # extraInitContainers: []
@@ -775,9 +775,9 @@ scheduler:
     - /dags
     image: amazon/aws-cli:2.1.34
     name: sync-dags
-    volumeMounts:
-    - mountPath: /dags
-      name: dags
+    # volumeMounts:
+    # - mountPath: /dags
+    #   name: dags
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
   #   extraVolumes:
