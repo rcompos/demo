@@ -777,10 +777,10 @@ scheduler:
     - mountPath: /opt/airflow/dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/credentials
+      mountPath: /home/airflow/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/config
+      mountPath: /home/airflow/.aws/config
       subPath: config
 
   # Add additional init containers into scheduler.
@@ -798,10 +798,10 @@ scheduler:
     - mountPath: /opt/airflow/dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/credentials
+      mountPath: /home/airflow/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /root/.aws/config
+      mountPath: /home/airflow/.aws/config
       subPath: config
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
