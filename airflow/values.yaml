@@ -751,7 +751,19 @@ scheduler:
   # Launch additional containers into scheduler.
   extraContainers: []
   # Add additional init containers into scheduler.
-  extraInitContainers: []
+  # extraInitContainers: []
+  extraInitContainers:
+  - args:
+    - while true; aws s3 sync --exact-timestamps --delete 's3://rcompos-example-bucket/dags' '/dags';
+      do sleep 600; done;
+    command:
+    - /bin/bash
+    - -c
+    - --
+    image: amazon/aws-cli:2.1.34
+    volumeMounts:
+    - mountPath: /dags
+      name: dags
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
   #   extraVolumes:
