@@ -591,15 +591,15 @@ workers:
     - /opt/airflow/dags
     image: amazon/aws-cli:2.1.34
     name: sync-dags
-    # volumeMounts:
-    # - mountPath: /dags
-    #   name: shared-dags
-    # - name: aws-creds-cm-volume
-    #   mountPath: /root/.aws/credentials
-    #   subPath: credentials
-    # - name: aws-creds-cm-volume
-    #   mountPath: /root/.aws/config
-    #   subPath: config
+    volumeMounts:
+    - mountPath: /dags
+      name: shared-dags
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/credentials
+      subPath: credentials
+    - name: aws-creds-cm-volume
+      mountPath: /root/.aws/config
+      subPath: config
 
   # Mount additional volumes into worker. It can be templated like in the following example:
   #   extraVolumes:
@@ -777,10 +777,10 @@ scheduler:
     - mountPath: /opt/airflow/dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /opt/airflow/.aws/credentials
+      mountPath: /root/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /opt/airflow/.aws/config
+      mountPath: /root/.aws/config
       subPath: config
 
   # Add additional init containers into scheduler.
@@ -798,10 +798,10 @@ scheduler:
     - mountPath: /opt/airflow/dags
       name: shared-dags
     - name: aws-creds-cm-volume
-      mountPath: /opt/airflow/.aws/credentials
+      mountPath: /root/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /opt/airflow/.aws/config
+      mountPath: /root/.aws/config
       subPath: config
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
@@ -829,10 +829,10 @@ scheduler:
     - name: shared-dags
       mountPath: /opt/airflow/dags
     - name: aws-creds-cm-volume
-      mountPath: /opt/airflow/.aws/credentials
+      mountPath: /root/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
-      mountPath: /opt/airflow/.aws/config
+      mountPath: /root/.aws/config
       subPath: config
 
   # Select certain nodes for airflow scheduler pods.
