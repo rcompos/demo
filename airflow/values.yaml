@@ -41,7 +41,8 @@ gid: 0
 #  fsGroup: 0
 #  runAsGroup: 0
 securityContext:
-  privileged: true
+ runAsUser: 50000
+ fsGroup: 50000
 
 # Airflow home directory
 # Used for mount paths
