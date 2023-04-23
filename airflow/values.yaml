@@ -597,6 +597,9 @@ workers:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
+    securityContext:
+      runAsUser: 0
+      runAsGroup: 0
 
   # Mount additional volumes into worker. It can be templated like in the following example:
   #   extraVolumes:
@@ -773,42 +776,30 @@ scheduler:
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
+    securityContext:
+      runAsUser: 0
+      runAsGroup: 0
 
-  # # Add additional init containers into scheduler.
-  # # extraInitContainers: []
-  # extraInitContainers:
-  # - args:
-  #   - s3
-  #   - cp
-  #   - --recursive
-  #   - s3://rcompos-example-bucket/dags
-  #   - /opt/airflow/dags
-  #   image: amazon/aws-cli:2.1.34
-  #   name: dag-sync-init
-  #   volumeMounts:
-  #   - mountPath: /opt/airflow/dags
-  #     name: shared-dags
-  #   - name: aws-creds-cm-volume
-  #     mountPath: /root/.aws/credentials
-  #     subPath: credentials
-  #   - name: aws-creds-cm-volume
-  #     mountPath: /root/.aws/config
-  #     subPath: config
-
-  # TEST init container for debug
+  # Add additional init containers into scheduler.
+  # extraInitContainers: []
   extraInitContainers:
-  - args: ["s3", "ls"]
-    name: dag-sync-init-test
+  - args:
+    - s3
+    - cp
+    - --recursive
+    - s3://rcompos-example-bucket/dags
+    - /opt/airflow/dags
     image: amazon/aws-cli:2.1.34
+    name: dag-sync-init
     volumeMounts:
+    - mountPath: /opt/airflow/dags
+      name: shared-dags
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/credentials
       subPath: credentials
     - name: aws-creds-cm-volume
       mountPath: /root/.aws/config
       subPath: config
-    - name: shared-dags
-      mountPath: /opt/airflow/dags
     securityContext:
       runAsUser: 0
       runAsGroup: 0
