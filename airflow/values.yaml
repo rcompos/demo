@@ -810,7 +810,9 @@ scheduler:
     - name: shared-dags
       mountPath: /opt/airflow/dags
     securityContext:
-      allowPrivilegeEscalation: true
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
 
   # Mount additional volumes into scheduler. It can be templated like in the following example:
   #   extraVolumes:
