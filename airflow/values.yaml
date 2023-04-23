@@ -760,7 +760,7 @@ scheduler:
   extraContainers:
   - args:
     - while true; aws s3 sync --exact-timestamps --delete 's3://rcompos-example-bucket/dags' '/opt/airflow/dags';
-      do sleep 600; done;
+      do sleep 60; done;
     command:
     - /bin/bash
     - -c
