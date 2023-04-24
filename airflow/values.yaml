@@ -587,7 +587,7 @@ workers:
     - --recursive
     - s3://rcompos-example-bucket/dags
     - /opt/airflow/dags
-    image: amazon/aws-cli:2.1.34
+    image: amazon/aws-cli:2.11.15
     name: sync-dags
     volumeMounts:
     - mountPath: /dags
@@ -767,7 +767,7 @@ scheduler:
     - -c
     - --
     name: dag-sync-sidecar
-    image: amazon/aws-cli:2.1.34
+    image: amazon/aws-cli:2.11.15
     volumeMounts:
     - mountPath: /opt/airflow/dags
       name: shared-dags
@@ -790,7 +790,7 @@ scheduler:
     - --recursive
     - s3://rcompos-example-bucket/dags
     - /opt/airflow/dags
-    image: amazon/aws-cli:2.1.34
+    image: amazon/aws-cli:2.11.15
     name: dag-sync-init
     volumeMounts:
     - mountPath: /opt/airflow/dags
