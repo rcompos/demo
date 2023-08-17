@@ -51,3 +51,12 @@ apps:
     repo: ""
     path: ""
     targetRev: ""
+  metalLB:
+    name: metallb
+    fullnameOverride: ""
+    values: []
+    namespace: ""
+    repo: ""
+    path: ""
+    targetRev: ""
+    ignoreDiffs: true
