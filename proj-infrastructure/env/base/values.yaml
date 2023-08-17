@@ -43,3 +43,11 @@ apps:
     repo: ""
     path: ""
     targetRev: ""
+  jupyterhub:
+    name: jupyterhub
+    fullnameOverride: ""
+    values: []
+    namespace: ""
+    repo: ""
+    path: ""
+    targetRev: ""
