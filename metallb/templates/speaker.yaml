@@ -110,7 +110,13 @@ metadata:
   labels:
     {{- include "metallb.labels" . | nindent 4 }}
     app.kubernetes.io/component: speaker
+    {{- range $key, $value := .Values.speaker.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
+  {{- if .Values.speaker.updateStrategy }}
+  updateStrategy: {{- toYaml .Values.speaker.updateStrategy | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "metallb.selectorLabels" . | nindent 6 }}
@@ -132,6 +138,9 @@ spec:
       labels:
         {{- include "metallb.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: speaker
+        {{- range $key, $value := .Values.speaker.labels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
     spec:
       {{- if .Values.speaker.runtimeClassName }}
       runtimeClassName: {{ .Values.speaker.runtimeClassName }}
@@ -143,8 +152,20 @@ spec:
       serviceAccountName: {{ template "metallb.speaker.serviceAccountName" . }}
       terminationGracePeriodSeconds: 0
       hostNetwork: true
-      {{- if .Values.speaker.frr.enabled }}
       volumes:
+      {{- if .Values.speaker.memberlist.enabled }}
+        - name: memberlist
+          secret:
+            secretName: {{ include "metallb.secretName" . }}
+            defaultMode: 420
+      {{- end }}
+      {{- if .Values.speaker.excludeInterfaces.enabled }}
+        - name: metallb-excludel2
+          configMap:
+            defaultMode: 256
+            name: metallb-excludel2
+      {{- end }}
+      {{- if .Values.speaker.frr.enabled }}
         - name: frr-sockets
           emptyDir: {}
         - name: frr-startup
@@ -156,6 +177,11 @@ spec:
           emptyDir: {}
         - name: metrics
           emptyDir: {}
+      {{- if .Values.prometheus.speakerMetricsTLSSecret }}
+        - name: metrics-certs
+          secret:
+            secretName: {{ .Values.prometheus.speakerMetricsTLSSecret }}
+      {{- end }}
       initContainers:
         # Copies the initial config files with the right permissions to the shared volume.
         - name: cp-frr-files
@@ -191,11 +217,17 @@ spec:
         {{- if .Values.speaker.image.pullPolicy }}
         imagePullPolicy: {{ .Values.speaker.image.pullPolicy }}
         {{- end }}
+        {{- if .Values.speaker.command }}
+        command:
+          - {{ .Values.speaker.command }}
+        {{- end }}
         args:
         - --port={{ .Values.prometheus.metricsPort }}
-        - --config={{ template "metallb.configMapName" . }}
         {{- with .Values.speaker.logLevel }}
         - --log-level={{ . }}
+        {{- end }}
+        {{- if .Values.loadBalancerClass }}
+        - --lb-class={{ .Values.loadBalancerClass }}
         {{- end }}
         env:
         - name: METALLB_NODE_NAME
@@ -215,11 +247,8 @@ spec:
           value: "app.kubernetes.io/name={{ include "metallb.name" . }},app.kubernetes.io/component=speaker"
         - name: METALLB_ML_BIND_PORT
           value: "{{ .Values.speaker.memberlist.mlBindPort }}"
-        - name: METALLB_ML_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "metallb.secretName" . }}
-              key: secretkey
+        - name: METALLB_ML_SECRET_KEY_PATH
+          value: "{{ .Values.speaker.memberlist.mlSecretKeyPath }}"
         {{- end }}
         {{- if .Values.speaker.frr.enabled }}
         - name: FRR_CONFIG_FILE
@@ -228,8 +257,6 @@ spec:
           value: /etc/frr_reloader/reloader.pid
         - name: METALLB_BGP_TYPE
           value: frr
-        - name: FRR_LOGGING_LEVEL
-          value: {{ .Values.speaker.frr.logLevel }}
         {{- end }}
         ports:
         - name: monitoring
@@ -266,7 +293,7 @@ spec:
         {{- end }}
         {{- with .Values.speaker.resources }}
         resources:
-          {{- toYaml . | nindent 12 }}
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         securityContext:
           allowPrivilegeEscalation: false
@@ -276,11 +303,21 @@ spec:
             - ALL
             add:
             - NET_RAW
-        {{- if .Values.speaker.frr.enabled }}
+        {{- if or .Values.speaker.frr.enabled .Values.speaker.memberlist.enabled .Values.speaker.excludeInterfaces.enabled }}
         volumeMounts:
+          {{- if .Values.speaker.memberlist.enabled }}
+          - name: memberlist 
+            mountPath: {{ .Values.speaker.memberlist.mlSecretKeyPath }}
+          {{- end }}
+          {{- if .Values.speaker.frr.enabled }}
           - name: reloader
             mountPath: /etc/frr_reloader
-         {{- end }}
+          {{- end }}
+          {{- if .Values.speaker.excludeInterfaces.enabled }}
+          - name: metallb-excludel2
+            mountPath: /etc/metallb
+          {{- end }}
+        {{- end }}
       {{- if .Values.speaker.frr.enabled }}
       - name: frr
         securityContext:
@@ -316,6 +353,26 @@ spec:
               attempts=$(( $attempts + 1 ))
             done
             tail -f /etc/frr/frr.log
+        {{- with .Values.speaker.frr.resources }}
+        resources:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- if .Values.speaker.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: {{ .Values.speaker.frr.metricsPort }}
+          periodSeconds: {{ .Values.speaker.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.speaker.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.speaker.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: /livez
+            port: {{ .Values.speaker.frr.metricsPort }}
+          failureThreshold: {{ .Values.speaker.startupProbe.failureThreshold }}
+          periodSeconds: {{ .Values.speaker.startupProbe.periodSeconds }}
+        {{- end }}
       - name: reloader
         image: {{ .Values.speaker.frr.image.repository }}:{{ .Values.speaker.frr.image.tag | default .Chart.AppVersion }}
         {{- if .Values.speaker.frr.image.pullPolicy }}
@@ -329,13 +386,17 @@ spec:
             mountPath: /etc/frr
           - name: reloader
             mountPath: /etc/frr_reloader
+        {{- with .Values.speaker.reloader.resources }}
+        resources:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
       - name: frr-metrics
         image: {{ .Values.speaker.frr.image.repository }}:{{ .Values.speaker.frr.image.tag | default .Chart.AppVersion }}
         command: ["/etc/frr_metrics/frr-metrics"]
         args:
-          - --metrics-port=7473
+          - --metrics-port={{ .Values.speaker.frr.metricsPort }}
         ports:
-          - containerPort: 7473
+          - containerPort: {{ .Values.speaker.frr.metricsPort }}
             name: monitoring
         volumeMounts:
           - name: frr-sockets
@@ -344,7 +405,77 @@ spec:
             mountPath: /etc/frr
           - name: metrics
             mountPath: /etc/frr_metrics
+        {{- with .Values.speaker.frrMetrics.resources }}
+        resources:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
       {{- end }}
+      {{- if .Values.prometheus.secureMetricsPort }}
+      - name: kube-rbac-proxy
+        image: {{ .Values.prometheus.rbacProxy.repository }}:{{ .Values.prometheus.rbacProxy.tag }}
+        imagePullPolicy: {{ .Values.prometheus.rbacProxy.pullPolicy }}
+        args:
+          - --logtostderr
+          - --secure-listen-address=:{{ .Values.prometheus.secureMetricsPort }}
+          - --upstream=http://$(METALLB_HOST):{{ .Values.prometheus.metricsPort }}/
+          - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+        {{- if .Values.prometheus.speakerMetricsTLSSecret }}
+          - --tls-private-key-file=/etc/metrics/tls.key
+          - --tls-cert-file=/etc/metrics/tls.crt
+        {{- end }}
+        ports:
+          - containerPort: {{ .Values.prometheus.secureMetricsPort }}
+            name: metricshttps
+        env:
+          - name: METALLB_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+        resources:
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+        {{- if .Values.prometheus.speakerMetricsTLSSecret }}
+        volumeMounts:
+          - name: metrics-certs
+            mountPath: /etc/metrics
+            readOnly: true
+        {{- end }}
+      {{ end }}
+      {{- if .Values.speaker.frr.secureMetricsPort }}
+      - name: kube-rbac-proxy-frr
+        image: {{ .Values.prometheus.rbacProxy.repository }}:{{ .Values.prometheus.rbacProxy.tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.prometheus.rbacProxy.pullPolicy }}
+        args:
+          - --logtostderr
+          - --secure-listen-address=:{{ .Values.speaker.frr.secureMetricsPort }}
+          - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+          - --upstream=http://$(METALLB_HOST):{{ .Values.speaker.frr.metricsPort }}/
+        {{- if .Values.prometheus.speakerMetricsTLSSecret }}
+          - --tls-private-key-file=/etc/metrics/tls.key
+          - --tls-cert-file=/etc/metrics/tls.crt
+        {{- end }}
+        ports:
+          - containerPort: {{ .Values.speaker.frr.secureMetricsPort }}
+            name: metricshttps
+        env:
+          - name: METALLB_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+        resources:
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+        {{- if .Values.prometheus.speakerMetricsTLSSecret }}
+        volumeMounts:
+          - name: metrics-certs
+            mountPath: /etc/metrics
+            readOnly: true
+        {{- end }}
+      {{ end }}
       nodeSelector:
         "kubernetes.io/os": linux
         {{- with .Values.speaker.nodeSelector }}
@@ -360,6 +491,9 @@ spec:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
         operator: Exists
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+        operator: Exists        
       {{- end }}
       {{- with .Values.speaker.tolerations }}
         {{- toYaml . | nindent 6 }}
