@@ -6,7 +6,7 @@ spec:
     namePrefix: ""
   source:
     repoURL: https://github.com/rcompos/demo.git
-    targetRevision: master
+    targetRevision: main
 
 # GLobal app values file
 valueFiles:
