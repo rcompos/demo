@@ -57,6 +57,13 @@ spec:
   {{- end }}
   syncPolicy:
     syncOptions:
-    - CreateNamespace=true
+      {{- if $val.syncOptions }}
+      {{- range $val.syncOptions }}
+      - {{ . }}
+      {{- end }}
+      {{- else }}
+      - CreateNamespace=true
+      {{- end }}
+
 ---
 {{- end }}

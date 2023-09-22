@@ -1,23 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: proj-infrastructure
+  name: apps-data
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
-  # project: proj-infrastructure
   project: default
   destination:
     namespace: argocd
     server:  https://kubernetes.default.svc
   source:
-    path: proj-infrastructure
-    repoURL: https://github.com/rcompos/demo.git
-    targetRevision: main
+    path: apps-data
+    repoURL:  https://github.com/rcompos/demo.git
+    targetRevision: master
     helm:
       valueFiles:
-        - env/base/values.yaml
+        - env/rc-dev/values.yaml
 
   syncPolicy:
   #   automated: # automated sync by default retries failed attempts 5 times with following delays between attempts ( 5s, 10s, 20s, 40s, 80s ); retry controlled using `retry` field.

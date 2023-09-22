@@ -1,12 +1,12 @@
 spec:
-  # project: proj-infrastructure
+  # project: apps-data
   project: default
   destination:
     server: https://kubernetes.default.svc
     namePrefix: ""
   source:
     repoURL: https://github.com/rcompos/demo.git
-    targetRevision: main
+    targetRevision: master
 
 # GLobal app values file
 valueFiles:
@@ -22,41 +22,41 @@ valueFiles:
 #       - values.yaml                   # Values file (optional)
 #       - values-my-env.yaml            # Values file (optional will be merged)
 #     namespace: custom-namespace     # Namespace (optional)
-#     repo: https://gitlab.corp.atieva.com/data/my-repo.git   # Git chart repo (optional)
+#     repo: https://my-git-server.com/data/my-repo.git   # Git chart repo (optional)
 #     path: path/to/my-chart          # Path under chart repo (optional)
 #     targetRev: my/branch            # Git branch (optional)
+#     ignoreDiffs: true               # Ignore ArgoCD app diffs (true|false)
+#     syncOptions:                    # Sync options for sync policy (optional)
+#       - CreateNamespace=true          # Example
+#
+# Example:
+#
+# apps:
+#   myAppName:
+#     name: my-app-name
+#     fullnameOverride: ""
+#     values: []
+#     namespace: ""
+#     repo: ""
+#     path: ""
+#     targetRev: ""
+#     ignoreDiffs: ""
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
+#
+
+# Applications to deploy, including overrides
 
 apps:
+  postgresql:
+    name: postgresql
   nginx:
     name: nginx
-    fullnameOverride: ""
-    values: []
-    namespace: ""
-    repo: ""
-    path: ""
-    targetRev: ""
   airflow:
-    name: airflow 
-    fullnameOverride: ""
-    values: []
-    namespace: ""
-    repo: ""
-    path: ""
-    targetRev: ""
+    name: airflow
   jupyterhub:
     name: jupyterhub
-    fullnameOverride: ""
-    values: []
-    namespace: ""
-    repo: ""
-    path: ""
-    targetRev: ""
   metalLB:
     name: metallb
-    fullnameOverride: ""
-    values: []
-    namespace: ""
-    repo: ""
-    path: ""
-    targetRev: ""
-    ignoreDiffs: true
+  
