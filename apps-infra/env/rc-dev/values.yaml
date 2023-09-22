@@ -62,6 +62,8 @@ apps:
     name: cluster-autoscaler
   velero:
     name: velero
+  certManager:
+    name: cert-manager
   jaegerOperator:
     name: jaeger-operator
     syncOptions:
