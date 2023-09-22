@@ -13,7 +13,7 @@ spec:
   source:
     path: apps-data
     repoURL:  https://github.com/rcompos/demo.git
-    targetRevision: master
+    targetRevision: main
     helm:
       valueFiles:
         - env/rc-dev/values.yaml
