@@ -64,3 +64,6 @@ apps:
     name: velero
   jaegerOperator:
     name: jaeger-operator
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
