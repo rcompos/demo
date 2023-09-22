@@ -66,6 +66,7 @@ apps:
     name: cert-manager
   jaegerOperator:
     name: jaeger-operator
+    namespace: observability
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
